@@ -27,7 +27,8 @@
     unzip
     usbutils
     alacritty
-    google-chrome
+    lenovo-legion
+    brave
     discord
     zed-editor
     vlc

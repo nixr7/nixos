@@ -14,7 +14,9 @@
       intel-media-driver
       intel-compute-runtime
       vpl-gpu-rt
-      nvidia-vaapi-driver
+      vulkan-loader
+      vulkan-tools
+      vulkan-validation-layers
     ];
 
     extraPackages32 = with pkgs.pkgsi686Linux; [
@@ -30,26 +32,8 @@
   ########################
   ## NVIDIA
   ########################
-  boot.extraModprobeConfig = ''
-    options nvidia_modeset vblank_sem_control=0
-    options nvidia NVreg_UsePageAttributeTable=1
-    options nvidia NVreg_PreserveVideoMemoryAllocations=1 NVreg_TemporaryFilePath=/var/tmp
-  '';
+  services.xserver.videoDrivers = [ "modesetting" "nvidia" ];
 
-  boot.kernelModules = [
-    "nvidia_uvm"
-    "nvidia_modeset"
-    "nvidia_drm"
-    "nvidia"
-  ];
-
-  boot.kernelParams = [
-    "nvidia-drm.modeset=1"
-    "nvidia-drm.fbdev=1"
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-  ];
-
-  services.xserver.videoDrivers = [ "nvidia" ];
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = true;
@@ -72,13 +56,32 @@
   };
   hardware.nvidia.dynamicBoost.enable = true;
 
-  environment.sessionVariables = {
-      LIBVA_DRIVER_NAME = "nvidia";
-      GBM_BACKEND = "nvidia-drm";
-      __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-      WLR_NO_HARDWARE_CURSORS = "1";
-      NVD_BACKEND = "direct";
-    };
+  ########################
+  ## NVIDIA options
+  ########################
+
+    boot.extraModprobeConfig = ''
+      options nvidia_modeset vblank_sem_control=0
+      options nvidia NVreg_UsePageAttributeTable=1
+      options nvidia NVreg_PreserveVideoMemoryAllocations=1
+      options nvidia NVreg_TemporaryFilePath=/var/tmp
+    '';
+
+    boot.kernelModules = [
+      "nvidia_uvm"
+      "nvidia_modeset"
+      "nvidia_drm"
+      "nvidia"
+    ];
+
+    boot.kernelParams = [
+      "nvidia-drm.modeset=1"
+      "nvidia-drm.fbdev=1"
+      "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+    ];
+
+  # Blocklist Nouveau
+  boot.blacklistedKernelModules = [ "nouveau" ];
 
   ########################
   ## Bluetooth

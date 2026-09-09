@@ -45,13 +45,11 @@
 
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
-    MUTTER_DEBUG_ENABLE_THREADED_SWAP = "1";
   };
 
   # XDG Portal
   xdg.portal = {
     enable = true;
-
     xdgOpenUsePortal = true;
   };
 }
